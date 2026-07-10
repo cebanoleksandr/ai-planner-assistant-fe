@@ -6,8 +6,8 @@ import {
 } from '@mui/icons-material';
 
 export const menuItems = [
-  { text: 'Dashboard', path: '/', icon: <Dashboard /> },
-  { text: 'Calendar', path: '/calendar', icon: <CalendarMonth /> },
-  { text: 'Areas and Goals', path: '/areas', icon: <TrackChanges /> },
-  { text: 'Task Backlog', path: '/tasks', icon: <FormatListBulleted /> },
+  { text: 'Dashboard', path: '/app', icon: <Dashboard /> },
+  { text: 'Calendar', path: '/app/calendar', icon: <CalendarMonth /> },
+  { text: 'Areas and Goals', path: '/app/goals', icon: <TrackChanges /> },
+  { text: 'Task Backlog', path: '/app/tasks', icon: <FormatListBulleted /> },
 ];
