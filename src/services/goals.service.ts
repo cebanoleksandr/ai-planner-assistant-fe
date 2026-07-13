@@ -21,4 +21,8 @@ export const GoalsService = {
     const { data } = await api.patch<Goal>(`/goals/${id}/status`, { status });
     return data;
   },
+
+  async delete(id: string) {
+    await api.delete(`/goals/${id}`);
+  },
 };

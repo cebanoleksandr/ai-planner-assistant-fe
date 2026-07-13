@@ -16,6 +16,7 @@ export interface Goal {
   status: 'active' | 'completed' | 'paused';
   targetDate?: string;
   lifeArea?: LifeArea;
+  tasks?: Task[];
   createdAt: string;
 }
 

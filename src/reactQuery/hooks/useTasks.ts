@@ -22,6 +22,7 @@ export const useCreateTask = () => {
     mutationFn: TasksService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [EQueries.TASKS] });
+      queryClient.invalidateQueries({ queryKey: [EQueries.GOALS] });
     },
   });
 };
@@ -33,6 +34,19 @@ export const useToggleTaskComplete = () => {
     mutationFn: TasksService.toggleComplete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [EQueries.TASKS] });
+      queryClient.invalidateQueries({ queryKey: [EQueries.GOALS] });
+    },
+  });
+};
+
+export const useDeleteTask = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: TasksService.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EQueries.TASKS] });
+      queryClient.invalidateQueries({ queryKey: [EQueries.GOALS] }); 
     },
   });
 };

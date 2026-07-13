@@ -22,4 +22,8 @@ export const TasksService = {
     const { data } = await api.patch<Task>(`/tasks/${id}/toggle`);
     return data;
   },
+
+  async delete(id: string) {
+    await api.delete(`/tasks/${id}`);
+  },
 };

@@ -5,6 +5,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { menuItems } from '../../constants/menuItems';
+import CustomAlert from '../UI/CustomAlert';
 
 const DRAWER_WIDTH = 240;
 
@@ -58,6 +59,8 @@ export const MainLayout = () => {
       >
         <ChatIcon />
       </Fab>
+
+      <CustomAlert />
     </Box>
   );
 };

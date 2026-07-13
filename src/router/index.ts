@@ -6,11 +6,13 @@ import Dashboard from '../pages/Dashboard';
 import NotFoundPage from '../pages/NotFoundPage';
 import { MainLayout } from '../components/layouts/MainLayout';
 import CalendarPage from '../pages/CalendarPage';
-import GoalsPage from '../pages/GoalsPage';
 import TasksPage from '../pages/TasksPage';
 import { AuthLayout } from '../components/layouts/AuthLayout';
 import LoginPage from '../pages/Auth/LoginPage';
 import RegisterPage from '../pages/Auth/RegisterPage';
+import AreasPage from '../pages/AreasPage';
+import AreaDetailsPage from '../pages/AreaDetailsPage';
+import GoalDetailsPage from '../pages/GoalDetailsPage';
 
 const loader = () => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -55,8 +57,16 @@ export const routes: RouteObject[] = [
             Component: CalendarPage,
           },
           {
-            path: 'goals',
-            Component: GoalsPage,
+            path: 'areas',
+            Component: AreasPage,
+          },
+          {
+            path: 'areas/:areaId',
+            Component: AreaDetailsPage,
+          },
+          {
+            path: 'goals/:goalId',
+            Component: GoalDetailsPage,
           },
           {
             path: 'tasks',
