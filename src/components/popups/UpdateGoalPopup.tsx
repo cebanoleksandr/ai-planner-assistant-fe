@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -16,7 +16,7 @@ import { useForm, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import BasePopup from './BasePopup';
-import { useCreateGoal } from '../../reactQuery/hooks/useGoals';
+import { useUpdateGoal } from '../../reactQuery/hooks/useGoals';
 import { useLifeAreas } from '../../reactQuery/hooks/useLifeAreas';
 import { useAppDispatch } from '../../storage/hooks';
 import { setAlertAC } from '../../storage/alertSlice';
@@ -24,8 +24,11 @@ import { setAlertAC } from '../../storage/alertSlice';
 interface IProps {
   isVisible: boolean;
   onClose: () => void;
-  defaultAreaId?: string;
+  goalId: string;
+  initialTitle: string;
+  initialDescription?: string;
   initialTargetDate?: string;
+  initialLifeAreaId: string;
 }
 
 interface IGoalForm {
@@ -42,21 +45,41 @@ const schema = yup.object({
   lifeAreaId: yup.string().required('Life Area is required'),
 }).required();
 
-export const CreateGoalPopup: FC<IProps> = ({ isVisible, onClose, defaultAreaId, initialTargetDate }) => {
-  const createMutation = useCreateGoal();
+export const UpdateGoalPopup: FC<IProps> = ({ 
+  isVisible, 
+  onClose, 
+  goalId,
+  initialTitle,
+  initialDescription,
+  initialTargetDate,
+  initialLifeAreaId
+}) => {
+  const updateMutation = useUpdateGoal();
   const dispatch = useAppDispatch();
-  
   const { data: areas = [] } = useLifeAreas();
   
+  const formattedDate = initialTargetDate ? initialTargetDate.split('T')[0] : '';
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<IGoalForm>({
     resolver: yupResolver(schema) as Resolver<IGoalForm>,
     defaultValues: {
-      title: '',
-      description: '',
-      targetDate: initialTargetDate || '',
-      lifeAreaId: defaultAreaId || '',
+      title: initialTitle,
+      description: initialDescription || '',
+      targetDate: formattedDate,
+      lifeAreaId: initialLifeAreaId,
     }
   });
+
+  useEffect(() => {
+    if (isVisible) {
+      reset({
+        title: initialTitle,
+        description: initialDescription || '',
+        targetDate: formattedDate,
+        lifeAreaId: initialLifeAreaId,
+      });
+    }
+  }, [isVisible, initialTitle, initialDescription, formattedDate, initialLifeAreaId, reset]);
 
   const handleClose = () => {
     reset(); 
@@ -67,28 +90,30 @@ export const CreateGoalPopup: FC<IProps> = ({ isVisible, onClose, defaultAreaId,
     const payload = {
       ...data,
       targetDate: data.targetDate || undefined,
-      lifeAreaId: data.lifeAreaId, 
     };
 
-    createMutation.mutate(payload, {
-      onSuccess: () => {
-        handleClose();
-        dispatch(setAlertAC({ text: 'Goal was successfully created!', mode: 'success' }));
-      },
-      onError: (error) => {
-        dispatch(setAlertAC({ 
-          text: error?.message || 'Failed to create goal.', 
-          mode: 'error' 
-        }));
+    updateMutation.mutate(
+      { id: goalId, payload },
+      {
+        onSuccess: () => {
+          handleClose();
+          dispatch(setAlertAC({ text: 'Goal was successfully updated!', mode: 'success' }));
+        },
+        onError: (error) => {
+          dispatch(setAlertAC({ 
+            text: error?.message || 'Failed to update goal.', 
+            mode: 'error' 
+          }));
+        }
       }
-    });
+    );
   };
 
   return (
     <BasePopup isVisible={isVisible} onClose={handleClose}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 500 }}>
-          Create New Goal
+          Edit Goal
         </Typography>
         <IconButton onClick={handleClose} sx={{ color: 'text.secondary' }}>
           <CloseIcon />
@@ -131,11 +156,11 @@ export const CreateGoalPopup: FC<IProps> = ({ isVisible, onClose, defaultAreaId,
           />
 
           <FormControl fullWidth error={!!errors.lifeAreaId}>
-            <InputLabel id="life-area-select-label">Life Area</InputLabel>
+            <InputLabel id="edit-life-area-select-label">Life Area</InputLabel>
             <Select
-              labelId="life-area-select-label"
+              labelId="edit-life-area-select-label"
               label="Life Area"
-              defaultValue={defaultAreaId || ''}
+              defaultValue={initialLifeAreaId || ''}
               {...register('lifeAreaId')}
               MenuProps={{
                 sx: { zIndex: 1500 }
@@ -155,11 +180,11 @@ export const CreateGoalPopup: FC<IProps> = ({ isVisible, onClose, defaultAreaId,
         </Box>
         
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 1 }}>
-          <Button onClick={handleClose} color="inherit" disabled={createMutation.isPending}>
+          <Button onClick={handleClose} color="inherit" disabled={updateMutation.isPending}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={createMutation.isPending}>
-            {createMutation.isPending ? 'Saving...' : 'Create'}
+          <Button type="submit" variant="contained" disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? 'Saving...' : 'Save'}
           </Button>
         </Box>
       </Box>

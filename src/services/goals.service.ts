@@ -22,6 +22,11 @@ export const GoalsService = {
     return data;
   },
 
+  async update(id: string, payload: { title?: string; description?: string; targetDate?: string; lifeAreaId?: string }) {
+    const { data } = await api.patch<Goal>(`/goals/${id}`, payload);
+    return data;
+  },
+
   async delete(id: string) {
     await api.delete(`/goals/${id}`);
   },

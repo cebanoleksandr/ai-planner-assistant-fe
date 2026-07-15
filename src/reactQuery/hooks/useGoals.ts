@@ -38,6 +38,23 @@ export const useUpdateGoalStatus = () => {
   });
 };
 
+export const useUpdateGoal = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ 
+      id, 
+      payload 
+    }: { 
+      id: string; 
+      payload: { title?: string; description?: string; targetDate?: string; lifeAreaId?: string } 
+    }) => GoalsService.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EQueries.GOALS] });
+    },
+  });
+};
+
 export const useDeleteGoal = () => {
   const queryClient = useQueryClient();
   

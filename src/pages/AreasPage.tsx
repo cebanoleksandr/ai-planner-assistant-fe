@@ -9,13 +9,19 @@ import {
   CircularProgress,
   IconButton
 } from '@mui/material';
-import { Add as AddIcon, DeleteOutlineOutlined as DeleteIcon } from '@mui/icons-material';
+import { 
+  Add as AddIcon, 
+  DeleteOutlineOutlined as DeleteIcon,
+  EditOutlined as EditIcon
+} from '@mui/icons-material';
 import { useDeleteLifeArea, useLifeAreas } from '../reactQuery/hooks/useLifeAreas';
 import { useAppDispatch } from '../storage/hooks';
 import { setAlertAC } from '../storage/alertSlice';
 import { CreateAreaPopup } from '../components/popups/CreateAreaPopup';
 import { DeleteAreaPopup } from '../components/popups/DeleteAreaPopup';
+import { UpdateAreaPopup } from '../components/popups/UpdateAreaPopup';
 import { useNavigate } from 'react-router-dom';
+import type { LifeArea } from '../services/interfaces';
 
 export const AreasPage = () => {
   const { data: areas = [], isLoading } = useLifeAreas();
@@ -24,6 +30,7 @@ export const AreasPage = () => {
   const navigate = useNavigate();
   
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  
   const [deletePopupState, setDeletePopupState] = useState<{
     isVisible: boolean;
     areaId: string;
@@ -32,6 +39,18 @@ export const AreasPage = () => {
     isVisible: false,
     areaId: '',
     areaName: '',
+  });
+
+  const [editPopupState, setEditPopupState] = useState<{
+    isVisible: boolean;
+    areaId: string;
+    initialName: string;
+    initialColor: string;
+  }>({
+    isVisible: false,
+    areaId: '',
+    initialName: '',
+    initialColor: '',
   });
 
   const handleDeleteClick = (e: React.MouseEvent, id: string, name: string) => {
@@ -43,8 +62,22 @@ export const AreasPage = () => {
     });
   };
 
+  const handleEditClick = (e: React.MouseEvent, area: LifeArea) => {
+    e.stopPropagation();
+    setEditPopupState({
+      isVisible: true,
+      areaId: area.id,
+      initialName: area.name,
+      initialColor: area.color || '#1976d2',
+    });
+  };
+
   const closeDeletePopup = () => {
     setDeletePopupState(prev => ({ ...prev, isVisible: false }));
+  };
+
+  const closeEditPopup = () => {
+    setEditPopupState(prev => ({ ...prev, isVisible: false }));
   };
 
   const handleConfirmDelete = () => {
@@ -118,22 +151,26 @@ export const AreasPage = () => {
               >
                 <Box sx={{ height: 8, bgcolor: area.color || 'primary.main', width: '100%' }} />
                 
-                <IconButton
-                  size="small"
-                  onClick={(e) => handleDeleteClick(e, area.id, area.name)}
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 8,
-                    color: 'text.secondary',
-                    '&:hover': { color: 'error.main' }
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Box sx={{ position: 'absolute', top: 12, right: 8, display: 'flex', gap: 0.5 }}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleEditClick(e, area)}
+                    sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleDeleteClick(e, area.id, area.name)}
+                    sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
                 
                 <CardContent sx={{ pt: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ pr: 3, fontWeight: "bold" }}>
+                  <Typography variant="h6" gutterBottom sx={{ pr: 6, fontWeight: "bold" }}>
                     {area.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -157,6 +194,14 @@ export const AreasPage = () => {
         onConfirm={handleConfirmDelete}
         itemName={deletePopupState.areaName}
         isLoading={deleteMutation.isPending}
+      />
+
+      <UpdateAreaPopup
+        isVisible={editPopupState.isVisible}
+        onClose={closeEditPopup}
+        areaId={editPopupState.areaId}
+        initialName={editPopupState.initialName}
+        initialColor={editPopupState.initialColor}
       />
     </Box>
   );

@@ -18,6 +18,7 @@ import {
 import { 
   Add as AddIcon, 
   DeleteOutlineOutlined as DeleteIcon,
+  EditOutlined as EditIcon,
   ArrowBack as ArrowBackIcon 
 } from '@mui/icons-material';
 import { useLifeAreas } from '../reactQuery/hooks/useLifeAreas';
@@ -26,6 +27,8 @@ import { useAppDispatch } from '../storage/hooks';
 import { setAlertAC } from '../storage/alertSlice';
 import { CreateGoalPopup } from '../components/popups/CreateGoalPopup';
 import { DeleteGoalPopup } from '../components/popups/DeleteGoalPopup';
+import { UpdateGoalPopup } from '../components/popups/UpdateGoalPopup';
+import type { Goal } from '../services/interfaces';
 
 export const AreaDetailsPage = () => {
   const { areaId } = useParams<{ areaId: string }>();
@@ -40,10 +43,20 @@ export const AreaDetailsPage = () => {
 
   const [tabValue, setTabValue] = useState<'active' | 'completed' | 'paused'>('active');
   const [isCreatePopupVisible, setIsCreatePopupVisible] = useState(false);
+  
   const [deletePopupState, setDeletePopupState] = useState({
     isVisible: false,
     goalId: '',
     goalTitle: '',
+  });
+
+  const [editPopupState, setEditPopupState] = useState({
+    isVisible: false,
+    goalId: '',
+    initialTitle: '',
+    initialDescription: '',
+    initialTargetDate: '',
+    initialLifeAreaId: '',
   });
 
   const filteredGoals = useMemo(() => {
@@ -56,6 +69,18 @@ export const AreaDetailsPage = () => {
       isVisible: true,
       goalId: id,
       goalTitle: title,
+    });
+  };
+
+  const handleEditClick = (e: React.MouseEvent, goal: Goal) => {
+    e.stopPropagation();
+    setEditPopupState({
+      isVisible: true,
+      goalId: goal.id,
+      initialTitle: goal.title,
+      initialDescription: goal.description || '',
+      initialTargetDate: goal.targetDate || '',
+      initialLifeAreaId: goal.lifeArea?.id || areaId || '',
     });
   };
 
@@ -101,7 +126,7 @@ export const AreaDetailsPage = () => {
       <Box>
         <Button 
           startIcon={<ArrowBackIcon />} 
-          onClick={() => navigate('/areas')}
+          onClick={() => navigate('/app/areas')}
           color="inherit"
           sx={{ mb: 1, color: 'text.secondary' }}
         >
@@ -167,23 +192,27 @@ export const AreaDetailsPage = () => {
                   }
                 }}
               >
-                <IconButton
-                  size="small"
-                  onClick={(e) => handleDeleteClick(e, goal.id, goal.title)}
-                  disabled={deleteMutation.isPending && deleteMutation.variables === goal.id}
-                  sx={{
-                    position: 'absolute',
-                    top: 12,
-                    right: 8,
-                    color: 'text.secondary',
-                    '&:hover': { color: 'error.main' }
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+                <Box sx={{ position: 'absolute', top: 12, right: 8, display: 'flex', gap: 0.5 }}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleEditClick(e, goal)}
+                    sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleDeleteClick(e, goal.id, goal.title)}
+                    disabled={deleteMutation.isPending && deleteMutation.variables === goal.id}
+                    sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
                 
                 <CardContent sx={{ pt: 3 }}>
-                  <Typography variant="h6" gutterBottom sx={{ pr: 3, fontWeight: "bold" }}>
+                  <Typography variant="h6" gutterBottom sx={{ pr: 6, fontWeight: "bold" }}>
                     {goal.title}
                   </Typography>
                   
@@ -262,6 +291,16 @@ export const AreaDetailsPage = () => {
         onConfirm={handleConfirmDelete}
         itemName={deletePopupState.goalTitle}
         isLoading={deleteMutation.isPending}
+      />
+
+      <UpdateGoalPopup
+        isVisible={editPopupState.isVisible}
+        onClose={() => setEditPopupState(prev => ({ ...prev, isVisible: false }))}
+        goalId={editPopupState.goalId}
+        initialTitle={editPopupState.initialTitle}
+        initialDescription={editPopupState.initialDescription}
+        initialTargetDate={editPopupState.initialTargetDate}
+        initialLifeAreaId={editPopupState.initialLifeAreaId}
       />
     </Box>
   );

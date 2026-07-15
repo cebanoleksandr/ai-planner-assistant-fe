@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -16,7 +16,7 @@ import { useForm, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import BasePopup from './BasePopup';
-import { useCreateTask } from '../../reactQuery/hooks/useTasks';
+import { useUpdateTask } from '../../reactQuery/hooks/useTasks';
 import { useGoals } from '../../reactQuery/hooks/useGoals';
 import { useAppDispatch } from '../../storage/hooks';
 import { setAlertAC } from '../../storage/alertSlice';
@@ -24,8 +24,11 @@ import { setAlertAC } from '../../storage/alertSlice';
 interface IProps {
   isVisible: boolean;
   onClose: () => void;
-  defaultGoalId?: string;
+  taskId: string;
+  initialTitle: string;
+  initialDescription?: string;
   initialDueDate?: string;
+  initialGoalId: string;
 }
 
 interface ITaskForm {
@@ -42,21 +45,41 @@ const schema = yup.object({
   goalId: yup.string().required('Linked Goal is required'),
 }).required();
 
-export const CreateTaskPopup: FC<IProps> = ({ isVisible, onClose, defaultGoalId, initialDueDate }) => {
-  const createMutation = useCreateTask();
+export const UpdateTaskPopup: FC<IProps> = ({ 
+  isVisible, 
+  onClose, 
+  taskId,
+  initialTitle,
+  initialDescription,
+  initialDueDate,
+  initialGoalId
+}) => {
+  const updateMutation = useUpdateTask();
   const dispatch = useAppDispatch();
-  
   const { data: goals = [] } = useGoals();
   
+  const formattedDateTime = initialDueDate ? initialDueDate.slice(0, 16) : '';
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ITaskForm>({
     resolver: yupResolver(schema) as Resolver<ITaskForm>,
     defaultValues: {
-      title: '',
-      description: '',
-      dueDate: initialDueDate || '',
-      goalId: defaultGoalId || '',
+      title: initialTitle,
+      description: initialDescription || '',
+      dueDate: formattedDateTime,
+      goalId: initialGoalId,
     }
   });
+
+  useEffect(() => {
+    if (isVisible) {
+      reset({
+        title: initialTitle,
+        description: initialDescription || '',
+        dueDate: formattedDateTime,
+        goalId: initialGoalId,
+      });
+    }
+  }, [isVisible, initialTitle, initialDescription, formattedDateTime, initialGoalId, reset]);
 
   const handleClose = () => {
     reset(); 
@@ -67,28 +90,30 @@ export const CreateTaskPopup: FC<IProps> = ({ isVisible, onClose, defaultGoalId,
     const payload = {
       ...data,
       dueDate: data.dueDate || undefined,
-      goalId: data.goalId,
     };
 
-    createMutation.mutate(payload, {
-      onSuccess: () => {
-        handleClose();
-        dispatch(setAlertAC({ text: 'Task was successfully created!', mode: 'success' }));
-      },
-      onError: (error) => {
-        dispatch(setAlertAC({ 
-          text: error?.message || 'Failed to create task.', 
-          mode: 'error' 
-        }));
+    updateMutation.mutate(
+      { id: taskId, payload },
+      {
+        onSuccess: () => {
+          handleClose();
+          dispatch(setAlertAC({ text: 'Task was successfully updated!', mode: 'success' }));
+        },
+        onError: (error) => {
+          dispatch(setAlertAC({ 
+            text: error?.message || 'Failed to update task.', 
+            mode: 'error' 
+          }));
+        }
       }
-    });
+    );
   };
 
   return (
     <BasePopup isVisible={isVisible} onClose={handleClose}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h2" sx={{ fontWeight: 500 }}>
-          Create New Task
+          Edit Task
         </Typography>
         <IconButton onClick={handleClose} sx={{ color: 'text.secondary' }}>
           <CloseIcon />
@@ -131,11 +156,11 @@ export const CreateTaskPopup: FC<IProps> = ({ isVisible, onClose, defaultGoalId,
           />
 
           <FormControl fullWidth error={!!errors.goalId}>
-            <InputLabel id="goal-select-label">Linked Goal</InputLabel>
+            <InputLabel id="edit-goal-select-label">Linked Goal</InputLabel>
             <Select
-              labelId="goal-select-label"
+              labelId="edit-goal-select-label"
               label="Linked Goal"
-              defaultValue=""
+              defaultValue={initialGoalId || ''}
               {...register('goalId')}
               MenuProps={{
                 sx: { zIndex: 1500 }
@@ -155,11 +180,11 @@ export const CreateTaskPopup: FC<IProps> = ({ isVisible, onClose, defaultGoalId,
         </Box>
         
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 1 }}>
-          <Button onClick={handleClose} color="inherit" disabled={createMutation.isPending}>
+          <Button onClick={handleClose} color="inherit" disabled={updateMutation.isPending}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={createMutation.isPending}>
-            {createMutation.isPending ? 'Saving...' : 'Create'}
+          <Button type="submit" variant="contained" disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? 'Saving...' : 'Save'}
           </Button>
         </Box>
       </Box>

@@ -12,6 +12,11 @@ export const LifeAreasService = {
     return data;
   },
 
+  async update(id: string, payload: { name?: string; color?: string }) {
+    const { data } = await api.patch<LifeArea>(`/life-areas/${id}`, payload);
+    return data;
+  },
+
   async delete(id: string) {
     await api.delete(`/life-areas/${id}`);
   },

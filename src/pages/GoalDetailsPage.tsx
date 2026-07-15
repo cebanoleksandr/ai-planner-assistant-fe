@@ -8,24 +8,30 @@ import {
   CardContent,
   CircularProgress,
   IconButton,
-  Chip,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Checkbox,
   TextField,
-  LinearProgress
+  LinearProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  type SelectChangeEvent
 } from '@mui/material';
 import { 
   ArrowBack as ArrowBackIcon,
   DeleteOutlineOutlined as DeleteIcon,
+  EditOutlined as EditIcon,
 } from '@mui/icons-material';
-import { useGoals } from '../reactQuery/hooks/useGoals';
+import { useGoals, useUpdateGoalStatus } from '../reactQuery/hooks/useGoals';
 import { useCreateTask, useToggleTaskComplete, useDeleteTask } from '../reactQuery/hooks/useTasks';
 import { useAppDispatch } from '../storage/hooks';
 import { setAlertAC } from '../storage/alertSlice';
 import { DeleteTaskPopup } from '../components/popups/DeleteTaskPopup';
+import { UpdateTaskPopup } from '../components/popups/UpdateTaskPopup';
+import type { Task } from '../services/interfaces';
 
 export const GoalDetailsPage = () => {
   const { goalId } = useParams<{ goalId: string }>();
@@ -35,6 +41,7 @@ export const GoalDetailsPage = () => {
   const { data: goals = [], isLoading } = useGoals();
   const currentGoal = goals.find(g => g.id === goalId);
 
+  const updateStatusMutation = useUpdateGoalStatus();
   const createTaskMutation = useCreateTask();
   const toggleTaskMutation = useToggleTaskComplete();
   const deleteTaskMutation = useDeleteTask();
@@ -47,11 +54,36 @@ export const GoalDetailsPage = () => {
     taskTitle: '',
   });
 
+  const [editPopupState, setEditPopupState] = useState({
+    isVisible: false,
+    taskId: '',
+    initialTitle: '',
+    initialDescription: '',
+    initialDueDate: '',
+    initialGoalId: '',
+  });
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'No date set';
     return new Date(dateString).toLocaleDateString('en-US', { 
       month: 'short', day: 'numeric', year: 'numeric' 
     });
+  };
+
+  const handleStatusChange = (e: SelectChangeEvent) => {
+    const newStatus = e.target.value as 'active' | 'completed' | 'paused';
+    
+    updateStatusMutation.mutate(
+      { id: goalId as string, status: newStatus },
+      {
+        onSuccess: () => {
+          dispatch(setAlertAC({ text: `Goal marked as ${newStatus}`, mode: 'success' }));
+        },
+        onError: (error) => {
+          dispatch(setAlertAC({ text: error?.message || 'Failed to update status', mode: 'error' }));
+        }
+      }
+    );
   };
 
   const handleAddTask = (e: React.FormEvent) => {
@@ -83,8 +115,23 @@ export const GoalDetailsPage = () => {
     });
   };
 
+  const handleEditClick = (task: Task) => {
+    setEditPopupState({
+      isVisible: true,
+      taskId: task.id,
+      initialTitle: task.title,
+      initialDescription: task.description || '',
+      initialDueDate: task.dueDate || '',
+      initialGoalId: currentGoal?.id || '',
+    });
+  };
+
   const closeDeletePopup = () => {
     setDeletePopupState(prev => ({ ...prev, isVisible: false }));
+  };
+
+  const closeEditPopup = () => {
+    setEditPopupState(prev => ({ ...prev, isVisible: false }));
   };
 
   const handleConfirmDelete = () => {
@@ -144,14 +191,29 @@ export const GoalDetailsPage = () => {
               {currentGoal.title}
             </Typography>
             
-            <Chip 
-              label={currentGoal.status} 
-              color={
-                currentGoal.status === 'active' ? 'primary' :
-                currentGoal.status === 'completed' ? 'success' : 'default'
-              }
-              sx={{ textTransform: 'capitalize', fontWeight: 'bold' }}
-            />
+            <FormControl size="small">
+              <Select
+                value={currentGoal.status}
+                onChange={handleStatusChange}
+                disabled={updateStatusMutation.isPending}
+                sx={{ 
+                  textTransform: 'capitalize', 
+                  fontWeight: 'bold',
+                  height: 32,
+                  color: 
+                    currentGoal.status === 'active' ? 'primary.main' :
+                    currentGoal.status === 'completed' ? 'success.main' : 'text.secondary',
+                  bgcolor: 'action.hover',
+                  borderRadius: 4,
+                  '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                  '&:hover': { bgcolor: 'action.selected' }
+                }}
+              >
+                <MenuItem value="active" sx={{ fontWeight: 500, color: 'primary.main' }}>Active</MenuItem>
+                <MenuItem value="completed" sx={{ fontWeight: 500, color: 'success.main' }}>Completed</MenuItem>
+                <MenuItem value="paused" sx={{ fontWeight: 500, color: 'text.secondary' }}>Paused</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
 
           <Box sx={{ display: 'flex', gap: 3, color: 'text.secondary', mb: 1 }}>
@@ -207,13 +269,21 @@ export const GoalDetailsPage = () => {
                     transition: 'opacity 0.2s'
                   }}
                   secondaryAction={
-                    <IconButton 
-                      edge="end" 
-                      onClick={() => handleDeleteClick(task.id, task.title)} 
-                      disabled={deleteTaskMutation.isPending && deletePopupState.taskId === task.id}
-                    >
-                      <DeleteIcon color="error" />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <IconButton 
+                        edge="end" 
+                        onClick={() => handleEditClick(task)} 
+                      >
+                        <EditIcon color="action" />
+                      </IconButton>
+                      <IconButton 
+                        edge="end" 
+                        onClick={() => handleDeleteClick(task.id, task.title)} 
+                        disabled={deleteTaskMutation.isPending && deletePopupState.taskId === task.id}
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </Box>
                   }
                 >
                   <ListItemIcon sx={{ minWidth: 40 }}>
@@ -270,6 +340,16 @@ export const GoalDetailsPage = () => {
         onConfirm={handleConfirmDelete}
         itemName={deletePopupState.taskTitle}
         isLoading={deleteTaskMutation.isPending}
+      />
+
+      <UpdateTaskPopup
+        isVisible={editPopupState.isVisible}
+        onClose={closeEditPopup}
+        taskId={editPopupState.taskId}
+        initialTitle={editPopupState.initialTitle}
+        initialDescription={editPopupState.initialDescription}
+        initialDueDate={editPopupState.initialDueDate}
+        initialGoalId={editPopupState.initialGoalId}
       />
     </Box>
   );

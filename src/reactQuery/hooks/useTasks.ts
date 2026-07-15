@@ -39,6 +39,24 @@ export const useToggleTaskComplete = () => {
   });
 };
 
+export const useUpdateTask = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ 
+      id, 
+      payload 
+    }: { 
+      id: string; 
+      payload: { title?: string; description?: string; dueDate?: string; goalId?: string } 
+    }) => TasksService.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EQueries.TASKS] });
+      queryClient.invalidateQueries({ queryKey: [EQueries.GOALS] });
+    },
+  });
+};
+
 export const useDeleteTask = () => {
   const queryClient = useQueryClient();
   

@@ -23,6 +23,11 @@ export const TasksService = {
     return data;
   },
 
+  async update(id: string, payload: { title?: string; description?: string; dueDate?: string; goalId?: string }) {
+    const { data } = await api.patch<Task>(`/tasks/${id}`, payload);
+    return data;
+  },
+
   async delete(id: string) {
     await api.delete(`/tasks/${id}`);
   },

@@ -20,6 +20,18 @@ export const useCreateLifeArea = () => {
   });
 };
 
+export const useUpdateLifeArea = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: { name?: string; color?: string } }) => 
+      LifeAreasService.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EQueries.LIFE_AREAS] });
+    },
+  });
+};
+
 export const useDeleteLifeArea = () => {
   const queryClient = useQueryClient();
   
