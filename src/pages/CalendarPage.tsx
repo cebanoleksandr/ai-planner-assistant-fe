@@ -244,7 +244,7 @@ export const CalendarPage = () => {
           events={events}
           startAccessor={(event: object) => (event as CalendarEvent).start}
           endAccessor={(event: object) => (event as CalendarEvent).end}
-          allDayAccessor={(event: object) => (event as CalendarEvent).allDay}
+          allDayAccessor={(event: object) => !!(event as CalendarEvent).allDay}
           style={{ height: '100%' }}
           eventPropGetter={eventStyleGetter}
           onSelectEvent={handleSelectEvent}
