@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from 'react-router-dom';
+import { createHashRouter, redirect } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
 import App from '../App';
 import { AUTH_TOKEN_KEY } from '../constants';
@@ -97,6 +97,6 @@ export const routes: RouteObject[] = [
   },
 ];
 
-const router = createBrowserRouter(routes);
+const router = createHashRouter(routes);
 
 export default router;

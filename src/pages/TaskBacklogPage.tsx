@@ -12,7 +12,7 @@ import { CheckCircleOutlineOutlined as CheckCircleOutlineOutlined } from '@mui/i
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
-import { useTasks, useToggleTaskComplete, useUpdateTask } from '../reactQuery/hooks/useTasks';
+import { useTasks, useToggleTaskComplete, useUpdateTask, useOptimizeTasks } from '../reactQuery/hooks/useTasks';
 import { useGoals } from '../reactQuery/hooks/useGoals';
 import { UpdateTaskPopup } from '../components/popups/UpdateTaskPopup';
 import type { Task } from '../services/interfaces';
@@ -22,12 +22,14 @@ const TaskBacklogPage = () => {
   const { data: goals = [] } = useGoals();
   const updateTaskMutation = useUpdateTask();
   const toggleCompleteMutation = useToggleTaskComplete();
+  const optimizeTasksMutation = useOptimizeTasks();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isAiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiInsights, setAiInsights] = useState<string>('');
+  const [optimizedTasks, setOptimizedTasks] = useState<Task[]>([]);
 
   const handleDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -47,10 +49,18 @@ const TaskBacklogPage = () => {
   const handleOptimize = () => {
     setAiDrawerOpen(true);
     setAiInsights("AI is analyzing your workload, deadlines, and goal progress...");
+    setOptimizedTasks([]);
     
-    setTimeout(() => {
-      setAiInsights("Recommended: Focus on tasks with upcoming deadlines. I've analyzed your goals; prioritizing the 'Feature X implementation' will bring your 'Platform Launch' goal to 80% completion.");
-    }, 1500);
+    optimizeTasksMutation.mutate(undefined, {
+      onSuccess: (data) => {
+        setAiInsights(data?.message || "Tasks successfully optimized by AI!");
+        setOptimizedTasks(data?.optimizedTasks || []);
+      },
+      onError: () => {
+        setAiInsights("Failed to optimize tasks. Please try again later.");
+        setOptimizedTasks([]);
+      }
+    });
   };
 
   const groupedTasks = useMemo(() => {
@@ -90,9 +100,10 @@ const TaskBacklogPage = () => {
           color="secondary"
           startIcon={<AutoAwesomeIcon />}
           onClick={handleOptimize}
+          disabled={optimizeTasksMutation.isPending}
           sx={{ borderRadius: 2, textTransform: 'none' }}
         >
-          Optimize by AI
+          {optimizeTasksMutation.isPending ? 'Optimizing...' : 'Optimize by AI'}
         </Button>
       </Paper>
 
@@ -169,12 +180,47 @@ const TaskBacklogPage = () => {
       </DragDropContext>
 
       <Drawer anchor="right" open={isAiDrawerOpen} onClose={() => setAiDrawerOpen(false)}>
-        <Box sx={{ width: 350, p: 3 }}>
+        <Box sx={{ width: 380, p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AutoAwesomeIcon color="secondary" /> AI Insights
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Typography variant="body1">{aiInsights}</Typography>
+          
+          <Typography variant="body1" sx={{ mb: 3 }}>{aiInsights}</Typography>
+
+          {optimizedTasks.length > 0 && (
+            <>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                Suggested Task Order & Priority:
+              </Typography>
+              <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1.5, pb: 2 }}>
+                {optimizedTasks.map((task) => (
+                  <Paper key={task.id} variant="outlined" sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.title}</Typography>
+                      {task.priority && (
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            px: 1, py: 0.2, borderRadius: 1, fontWeight: 'bold',
+                            bgcolor: task.priority === 'High' ? 'error.light' : task.priority === 'Medium' ? 'warning.light' : 'success.light',
+                            color: 'white'
+                          }}
+                        >
+                          {task.priority}
+                        </Typography>
+                      )}
+                    </Box>
+                    {task.description && (
+                      <Typography variant="caption" color="text.secondary">
+                        {task.description}
+                      </Typography>
+                    )}
+                  </Paper>
+                ))}
+              </Box>
+            </>
+          )}
         </Box>
       </Drawer>
 

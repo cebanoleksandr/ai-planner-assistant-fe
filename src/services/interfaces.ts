@@ -28,4 +28,5 @@ export interface Task {
   dueDate?: string;
   goal?: Goal;
   createdAt: string;
+  priority?: string;
 }

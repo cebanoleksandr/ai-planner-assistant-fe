@@ -31,4 +31,9 @@ export const TasksService = {
   async delete(id: string) {
     await api.delete(`/tasks/${id}`);
   },
+
+  async optimizeTasks() {
+    const { data } = await api.post('/tasks/optimize');
+    return data;
+  },
 };
