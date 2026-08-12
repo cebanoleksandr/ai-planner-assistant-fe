@@ -20,6 +20,6 @@ export const AuthService = {
 
   logout() {
     localStorage.removeItem(AUTH_TOKEN_KEY);
-    window.location.href = '/auth/login';
+    window.location.href = `${import.meta.env.BASE_URL}#/auth/login`;
   },
 };
