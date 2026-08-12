@@ -172,7 +172,7 @@ export const GoalDetailsPage = () => {
   const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 }, maxWidth: '800px', margin: '0 auto', width: '100%' }}>
       <Box>
         <Button 
           startIcon={<ArrowBackIcon />} 
@@ -185,12 +185,12 @@ export const GoalDetailsPage = () => {
       </Box>
 
       <Card elevation={2}>
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: { xs: 2, sm: 4 } }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'flex-start' }, flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
               {currentGoal.title}
             </Typography>
-            
+
             <FormControl size="small">
               <Select
                 value={currentGoal.status}
@@ -216,7 +216,7 @@ export const GoalDetailsPage = () => {
             </FormControl>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 3, color: 'text.secondary', mb: 1 }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 0.5, sm: 3 }, color: 'text.secondary', mb: 1 }}>
             <Typography variant="body2">
               <strong>Target Date:</strong> {formatDate(currentGoal.targetDate)}
             </Typography>
@@ -236,7 +236,7 @@ export const GoalDetailsPage = () => {
       </Card>
 
       <Card elevation={2}>
-        <CardContent sx={{ p: 4 }}>
+        <CardContent sx={{ p: { xs: 2, sm: 4 } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Tasks
@@ -313,7 +313,7 @@ export const GoalDetailsPage = () => {
             )}
           </List>
 
-          <Box component="form" onSubmit={handleAddTask} sx={{ display: 'flex', gap: 2 }}>
+          <Box component="form" onSubmit={handleAddTask} sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
             <TextField
               fullWidth
               size="small"
@@ -322,11 +322,11 @@ export const GoalDetailsPage = () => {
               onChange={(e) => setNewTaskTitle(e.target.value)}
               disabled={createTaskMutation.isPending}
             />
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               disabled={!newTaskTitle.trim() || createTaskMutation.isPending}
-              sx={{ minWidth: '100px' }}
+              sx={{ minWidth: { xs: '100%', sm: '100px' } }}
             >
               Add
             </Button>

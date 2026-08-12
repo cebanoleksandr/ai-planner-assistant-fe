@@ -33,8 +33,10 @@ const BasePopup: FC<IProps> = ({ isVisible, onClose, children }) => {
 
           <motion.div
             key="modal"
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-120 m-0
-                       z-1400 shadow-lg p-4"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 m-0
+                       z-1400 shadow-lg w-[calc(100vw-2rem)] sm:w-auto sm:min-w-120
+                       max-w-[500px] max-h-[calc(100vh-2rem)] overflow-y-auto
+                       p-3 sm:p-4"
             style={{
               backgroundColor: theme.palette.background.paper,
               borderRadius: theme.shape.borderRadius,

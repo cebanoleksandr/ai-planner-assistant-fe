@@ -41,12 +41,13 @@ export const MainLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 1.5, sm: 3 },
+          minWidth: 0,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
         }}
       >
         <Toolbar />
-        <Outlet /> 
+        <Outlet />
       </Box>
 
       <ChatWidget open={isChatOpen} onClose={() => setIsChatOpen(false)} />

@@ -70,10 +70,10 @@ export const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: "bold", color: "text.primary"}}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", color: "text.primary", fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             Dashboard
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -81,7 +81,7 @@ export const Dashboard = () => {
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <Button 
             variant="outlined" 
             startIcon={<AddIcon />}
@@ -99,7 +99,7 @@ export const Dashboard = () => {
         </Stack>
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Card elevation={2} sx={{ height: '100%' }}>
             <CardHeader 

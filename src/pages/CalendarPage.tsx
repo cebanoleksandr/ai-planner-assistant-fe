@@ -212,9 +212,9 @@ export const CalendarPage = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: 'calc(100vh - 100px)' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 }, height: 'calc(100vh - 100px)' }}>
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+        <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
           Calendar
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -222,11 +222,12 @@ export const CalendarPage = () => {
         </Typography>
       </Box>
 
-      <Card 
-        elevation={2} 
-        sx={{ 
-          flexGrow: 1, 
-          p: 2,
+      <Card
+        elevation={2}
+        sx={{
+          flexGrow: 1,
+          p: { xs: 1, sm: 2 },
+          overflowX: 'auto',
           '& .rbc-addons-dnd-drag-preview': {
             opacity: '0.8 !important',
             boxShadow: '0px 8px 24px rgba(0,0,0,0.2) !important',
@@ -239,6 +240,7 @@ export const CalendarPage = () => {
           }
         }}
       >
+        <Box sx={{ minWidth: { xs: 640, sm: 0 }, height: '100%' }}>
         <DnDCalendar
           localizer={localizer}
           events={events}
@@ -256,8 +258,9 @@ export const CalendarPage = () => {
           selectable={true}
           onSelectSlot={handleSelectSlot}
           onEventDrop={onEventDrop} 
-          resizable={false} 
+          resizable={false}
         />
+        </Box>
       </Card>
 
       <AnimatePresence>
@@ -291,22 +294,23 @@ export const CalendarPage = () => {
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               elevation={24}
               sx={{
-                p: 4,
+                p: { xs: 3, sm: 4 },
                 borderRadius: 4,
-                minWidth: 320,
+                width: { xs: 'calc(100vw - 2rem)', sm: 'auto' },
+                minWidth: { xs: 0, sm: 320 },
                 maxWidth: '90%',
                 textAlign: 'center',
                 bgcolor: 'background.paper'
               }}
             >
-              <Typography variant="h5" sx={{ mb: 1, fontWeight: 'bold' }}>
+              <Typography variant="h5" sx={{ mb: 1, fontWeight: 'bold', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 Create New Event
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
                 Selected date: {selectedSlotDate ? format(selectedSlotDate, 'MMMM d, yyyy') : ''}
               </Typography>
-              
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'center', gap: 2 }}>
                 <Button 
                   variant="outlined" 
                   color="secondary"

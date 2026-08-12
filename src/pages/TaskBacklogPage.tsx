@@ -77,10 +77,10 @@ const TaskBacklogPage = () => {
   }, [tasks, goals, searchQuery, showCompleted]);
 
   return (
-    <Box sx={{ p: 3, maxWidth: 900, mx: 'auto' }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>Task Backlog</Typography>
+    <Box sx={{ p: { xs: 1.5, sm: 3 }, maxWidth: 900, mx: 'auto' }}>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>Task Backlog</Typography>
 
-      <Paper sx={{ p: 2, mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: 'center' }}>
+      <Paper sx={{ p: 2, mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: { xs: 'stretch', md: 'center' } }}>
         <TextField
           size="small"
           placeholder="Search tasks..."
@@ -180,7 +180,7 @@ const TaskBacklogPage = () => {
       </DragDropContext>
 
       <Drawer anchor="right" open={isAiDrawerOpen} onClose={() => setAiDrawerOpen(false)}>
-        <Box sx={{ width: 380, p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box sx={{ width: { xs: '100vw', sm: 380 }, maxWidth: '100vw', p: { xs: 2, sm: 3 }, display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AutoAwesomeIcon color="secondary" /> AI Insights
           </Typography>

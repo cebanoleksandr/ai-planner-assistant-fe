@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { 
-  Box, Paper, Typography, IconButton, TextField, CircularProgress, Divider 
+import {
+  Box, Paper, Typography, IconButton, TextField, CircularProgress, Divider, useMediaQuery
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -20,6 +21,8 @@ interface ChatWidgetProps {
 }
 
 export const ChatWidget = ({ open, onClose }: ChatWidgetProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [messages, setMessages] = useState<Message[]>([
     { id: '1', role: 'ai', text: "Hi! I'm your AI assistant. How can I help you today?" }
   ]);
@@ -61,29 +64,29 @@ export const ChatWidget = ({ open, onClose }: ChatWidgetProps) => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          style={{
-            position: 'fixed',
-            bottom: 90,
-            right: 24,
-            zIndex: 1400,
-          }}
+          style={
+            isMobile
+              ? { position: 'fixed', inset: 0, zIndex: 1400 }
+              : { position: 'fixed', bottom: 90, right: 24, zIndex: 1400 }
+          }
         >
           <Paper
             elevation={12}
             sx={{
-              width: 380,
-              height: 550,
-              maxHeight: '80vh',
+              width: { xs: '100vw', sm: 380 },
+              height: { xs: '100dvh', sm: 550 },
+              maxHeight: { xs: '100dvh', sm: '80vh' },
+              maxWidth: '100vw',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              borderRadius: 4,
+              borderRadius: { xs: 0, sm: 4 },
               border: '1px solid',
               borderColor: 'divider'
             }}
           >
             {/* Header */}
-            <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: 'primary.main', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <AutoAwesomeIcon fontSize="small" />
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>AI Planner Assistant</Typography>
@@ -94,9 +97,9 @@ export const ChatWidget = ({ open, onClose }: ChatWidgetProps) => {
             </Box>
 
             {/* Messages Area */}
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, bgcolor: 'grey.50', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ flexGrow: 1, overflowY: 'auto', p: { xs: 1.5, sm: 2 }, bgcolor: 'grey.50', display: 'flex', flexDirection: 'column', gap: 2 }}>
               {messages.map((msg) => (
-                <motion.div 
+                <motion.div
                   key={msg.id}
                   initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -110,7 +113,7 @@ export const ChatWidget = ({ open, onClose }: ChatWidgetProps) => {
                       color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
                       boxShadow: 1,
                     }}>
-                      <Typography variant="body2">{msg.text}</Typography>
+                      <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{msg.text}</Typography>
                     </Box>
                   </Box>
                 </motion.div>
@@ -125,7 +128,7 @@ export const ChatWidget = ({ open, onClose }: ChatWidgetProps) => {
 
             {/* Input Area */}
             <Divider />
-            <Box sx={{ p: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box sx={{ p: { xs: 1, sm: 2 }, display: 'flex', gap: 1, alignItems: 'center' }}>
               <TextField
                 fullWidth
                 size="small"

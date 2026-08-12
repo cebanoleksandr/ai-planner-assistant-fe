@@ -63,34 +63,48 @@ export const Header = ({ drawerWidth, currentTitle, handleDrawerToggle }: Header
           boxShadow: 1,
         }}
       >
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, px: { xs: 1.5, sm: 3 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
             <IconButton
               color="inherit"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: 'none' } }}
+              sx={{ mr: { xs: 1, sm: 2 }, display: { sm: 'none' } }}
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" noWrap component="div" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               {currentTitle}
             </Typography>
           </Box>
 
           {!isLoading && user && (
-            <Box>
+            <Box sx={{ flexShrink: 0 }}>
               <Button
                 onClick={handleMenuOpen}
                 color="inherit"
                 startIcon={<AccountCircle />}
-                sx={{ 
+                sx={{
                   textTransform: 'none',
                   color: 'text.secondary',
-                  '&:hover': { color: 'primary.main' }
+                  '&:hover': { color: 'primary.main' },
+                  minWidth: 0,
+                  px: { xs: 1, sm: 2 },
+                  '& .MuiButton-startIcon': { mr: { xs: 0, sm: 1 } },
                 }}
               >
-                {user.email}
+                <Box
+                  component="span"
+                  sx={{
+                    display: { xs: 'none', sm: 'inline' },
+                    maxWidth: 180,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {user.email}
+                </Box>
               </Button>
 
               <Menu

@@ -100,10 +100,10 @@ export const AreasPage = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}>
             Life Areas and Goals
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -130,7 +130,7 @@ export const AreasPage = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           {areas.map((area) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={area.id}>
               <Card 

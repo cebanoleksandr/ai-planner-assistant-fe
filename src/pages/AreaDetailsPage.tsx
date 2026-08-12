@@ -122,10 +122,10 @@ export const AreaDetailsPage = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
       <Box>
-        <Button 
-          startIcon={<ArrowBackIcon />} 
+        <Button
+          startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/app/areas')}
           color="inherit"
           sx={{ mb: 1, color: 'text.secondary' }}
@@ -134,11 +134,11 @@ export const AreaDetailsPage = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'flex-start' }, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography 
-            variant="h4" 
-            sx={{ fontWeight: 'bold', color: currentArea.color || 'primary.main', textTransform: 'uppercase' }}
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 'bold', color: currentArea.color || 'primary.main', textTransform: 'uppercase', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}
           >
             {currentArea.name}
           </Typography>
@@ -175,7 +175,7 @@ export const AreaDetailsPage = () => {
           </Typography>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           {filteredGoals.map((goal) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={goal.id}>
               <Card 
